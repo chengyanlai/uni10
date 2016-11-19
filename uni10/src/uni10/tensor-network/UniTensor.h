@@ -385,7 +385,7 @@ namespace uni10 {
         /// elements. \par
         /// If \c mat is diagonal,  all the off-diagonal elements are set to zero.
         /// @param mat The matrix elements to be assigned
-        void putBlock(const Block& mat);
+        void putBlock(const Block& mat, bool force=false);
 
         /// @brief Assign elements to a block
         ///
@@ -394,7 +394,7 @@ namespace uni10 {
         /// If \c mat is diagonal,  all the off-diagonal elements are set to zero.
         /// @param qnum quantum number of the block
         /// @param mat The matrix elements to be assigned
-        void putBlock(const Qnum& qnum, const Block& mat);
+        void putBlock(const Qnum& qnum, const Block& mat, bool force=false);
 
         int typeID()const;
 
@@ -754,9 +754,9 @@ namespace uni10 {
         /// elements. \par
         /// If \c mat is diagonal,  all the off-diagonal elements are set to zero.
         /// @param mat The matrix elements to be assigned
-        void putBlock(rflag tp, const Block& mat);
+        void putBlock(rflag tp, const Block& mat, bool force=false);
 
-        void putBlock(rflag tp, const Qnum& qnum, const Block& mat);
+        void putBlock(rflag tp, const Qnum& qnum, const Block& mat, bool force=false);
 
 
         void setElem(const Real* elem, bool _ongpu = false);
@@ -824,11 +824,9 @@ namespace uni10 {
         /// @overload
         void setRawElem(cflag tp, const Block& blk);
 
+        void putBlock(cflag tp, const Block& mat, bool force=false);
 
-        void putBlock(cflag tp, const Block& mat);
-
-
-        void putBlock(cflag tp, const Qnum& qnum, const Block& mat);
+        void putBlock(cflag tp, const Qnum& qnum, const Block& mat, bool force=false);
 
         void setElem(const Complex* c_elem, bool _ongpu = false);
 
