@@ -438,7 +438,7 @@ UniTensor::UniTensor(const std::vector<Bond>& _bonds, int* _labels, const std::s
 }
 
 UniTensor::UniTensor(const UniTensor& UniT): //GPU
-  r_flag(UniT.r_flag), c_flag(UniT.c_flag),name(UniT.name), elem(NULL), c_elem(NULL), status(UniT.status), 
+  r_flag(UniT.r_flag), c_flag(UniT.c_flag),name(UniT.name), elem(NULL), c_elem(NULL), status(UniT.status),
 bonds(UniT.bonds), blocks(UniT.blocks), labels(UniT.labels), \
     RBondNum(UniT.RBondNum), RQdim(UniT.RQdim), CQdim(UniT.CQdim), m_elemNum(UniT.m_elemNum), RQidx2Blk(UniT.RQidx2Blk), QidxEnc(UniT.QidxEnc),  RQidx2Off(UniT.RQidx2Off), CQidx2Off(UniT.CQidx2Off), RQidx2Dim(UniT.RQidx2Dim), CQidx2Dim(UniT.CQidx2Dim){
     try{
@@ -1049,6 +1049,53 @@ void UniTensor::h5save(const std::string& fname){
     propogate_exception(e, "In function UniTensor::h5save(std::string&):");
   }
 }
+void UniTensor::h5save(HDF5IO* h5f, const std::string& group_prefix){
+  try{
+    if((status & HAVEBOND) == 0){   //If not INIT, NO NEED to write out to file
+      throw std::runtime_error(exception_msg("Saving a tensor without bonds(scalar) is not supported."));
+    }
+    h5f->getGroup(group_prefix);
+    std::string path = group_prefix;
+    path.append("Status");
+    h5f->saveNumber(path, "status", status);
+    h5f->saveFlag(path, "flag", r_flag, c_flag);
+    int bondNum = bonds.size();
+    path = group_prefix;
+    path.append("Bonds");
+    h5f->saveNumber(path, "bondNum", bondNum);
+    for(int b = 0; b < bondNum; b++){
+      int num_q = bonds[b].Qnums.size();
+      std::string gname = group_prefix;
+      gname.append("Bonds/bond-");
+      gname.append(std::to_string((unsigned long long)b));
+      h5f->saveNumber(gname, "numQnums", num_q);
+      h5f->saveBond(gname, "bondType", bonds[b].m_type);
+      h5f->saveStdVector(gname, "degs", bonds[b].Qdegs);
+      for (int cnt_q = 0; cnt_q < num_q; cnt_q++) {
+          std::string setname = "Qnum-";
+          setname.append(std::to_string((unsigned long long)cnt_q));
+          h5f->saveQnum(gname, setname, bonds[b].Qnums[cnt_q].U1(), bonds[b].Qnums[cnt_q].prt(), bonds[b].Qnums[cnt_q].prtF());
+      }
+    }
+    int num_l = labels.size();
+    h5f->saveNumber(path, "num_label", num_l);
+    h5f->saveStdVector(path, "labels", labels);
+    path = group_prefix;
+    path.append("Block");
+    if(typeID() == 1){
+        if(status & HAVEELEM){
+            h5f->saveRawBuffer(path, "m_elem", m_elemNum, elem);
+        }
+    }
+    if(typeID() == 2){
+        if(status & HAVEELEM){
+            h5f->saveRawBuffer(path, "m_elem", m_elemNum, c_elem);
+        }
+    }
+  } catch(const std::exception& e){
+    propogate_exception(e, "In function UniTensor::h5save(std::string&):");
+  }
+}
 #endif
 
 UniTensor& UniTensor::transpose(){
@@ -1248,9 +1295,9 @@ void UniTensor::putBlock(const Qnum& qnum, const Block& mat){
       throw std::runtime_error(exception_msg(err.str()));
     }
 
-    if(mat.typeID() == 1) 
+    if(mat.typeID() == 1)
       this->putBlock(RTYPE, qnum, mat);
-    else if(mat.typeID() == 2) 
+    else if(mat.typeID() == 2)
       this->putBlock(CTYPE, qnum, mat);
 
   }
@@ -1704,7 +1751,7 @@ void UniTensor::printDiagram()const{
 UniTensor& UniTensor::cTranspose(){
   try{
     if(typeID() == 1)
-      return this->transpose(RTYPE); 
+      return this->transpose(RTYPE);
     else if(typeID() == 2)
       return this->cTranspose(CTYPE);
 

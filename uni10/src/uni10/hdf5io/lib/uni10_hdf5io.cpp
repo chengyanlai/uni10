@@ -147,35 +147,36 @@ bool HDF5IO::fileExists(const std::string& FileName){
 }
 
 HDF5IO::HDF5IO (const std::string& fn) :
-FileName(fn),
 H5File(fn.c_str(), fileExists(fn) ? H5F_ACC_RDWR : H5F_ACC_TRUNC),
+FileName(fn),
 Uni10TypeGroup(getGroup("uni10Types")),
 ComplexDataType(initCompexDataType()),
+QnumCompType(initQnumCompType()),
 BondEnumType(initBondEnumType()),
-RCflagType(initRCflagType()),
-QnumCompType(initQnumCompType()){
-    std::cout << "Open Hdf5 file - " << FileName << std::endl;
+RCflagType(initRCflagType()){
+    // std::cout << "Open Hdf5 file - " << FileName << std::endl;
 }
 
 HDF5IO::HDF5IO (const std::string& fn, const bool force):
-FileName(fn),
 H5File(fn.c_str(), H5F_ACC_TRUNC),
+FileName(fn),
 Uni10TypeGroup(getGroup("uni10Types")),
 ComplexDataType(initCompexDataType()),
+QnumCompType(initQnumCompType()),
 BondEnumType(initBondEnumType()),
-RCflagType(initRCflagType()),
-QnumCompType(initQnumCompType()){
+RCflagType(initRCflagType()){
     std::cout << "Force opend HDF5 file - " << FileName << std::endl;
 }
 
 HDF5IO::~HDF5IO(){
-    std::cout << "Close HDF5 file - " << this->getFileName() << std:: endl;
+    // std::cout << "Close HDF5 file - " << this->getFileName() << std:: endl;
     this->close();
 }
 
 H5::Group HDF5IO::getGroup(const std::string &GroupName){
     H5::Group group;
     try{
+        H5::Exception::dontPrint();
         group = H5::Group( this->openGroup( GroupName.c_str() ) );
     } catch( H5::FileIException not_found_error ){
         group = H5::Group( this->createGroup( GroupName.c_str() ) );

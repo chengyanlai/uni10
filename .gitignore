@@ -1,2 +1,5 @@
 *.[oea]
 *.pyc
+build
+apps
+.clang_complete

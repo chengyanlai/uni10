@@ -46,6 +46,7 @@
 #include <uni10/data-structure/Bond.h>
 #include <uni10/data-structure/Block.h>
 #include <uni10/tensor-network/Matrix.h>
+#include <uni10/hdf5io/uni10_hdf5io.h>
 
 /// @brief Uni10 - the Universal Tensor %Network Library
 namespace uni10 {
@@ -582,6 +583,7 @@ namespace uni10 {
         /// Saves UniTensor to a HDF5 file named \c fname.
         /// @param fname filename
         void h5save(const std::string& fname);
+        void h5save(HDF5IO* h5f, const std::string& group_prefix);
 #endif
         /// @brief Transpose  block elements
         ///
