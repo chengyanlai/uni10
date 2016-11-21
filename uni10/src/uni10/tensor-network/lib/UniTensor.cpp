@@ -1436,13 +1436,10 @@ Matrix UniTensor::getRawElem()const{
 
 UniTensor& UniTensor::assign(const std::vector<Bond>& _bond){
   try{
-    if ( this->typeID() == 1 ){
-      UniTensor T("R", _bond);
-      *this = T;
-    }else if ( this->typeID() == 2 ){
-      UniTensor T("C", _bond);
-      *this = T;
-    }
+    if(typeID() == 1)
+      this->assign(RTYPE, _bond);
+    else if(typeID() == 2)
+      this->assign(CTYPE, _bond);
   }
   catch(const std::exception& e){
     propogate_exception(e, "In function UniTensor::assign(std::vector<Bond>&):");
