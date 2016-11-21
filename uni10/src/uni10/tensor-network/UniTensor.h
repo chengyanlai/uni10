@@ -361,7 +361,7 @@ namespace uni10 {
         /// @brief Create a UniTensor from a HDF5 file
         ///
         /// @param fname Filename to be read in
-        UniTensor(const std::string& fname, const bool hdf5);
+        UniTensor(const std::string& fname, const std::string& prefix = "/", const bool hdf5 = true);
 #endif
         /// @brief Create a UniTensor from a Block
         UniTensor(const Block& UniT);
@@ -583,7 +583,7 @@ namespace uni10 {
         /// Saves UniTensor to a HDF5 file named \c fname.
         /// @param fname filename
         void h5save(const std::string& fname);
-        void h5save(HDF5IO* h5f, const std::string& group_prefix);
+        void h5save(HDF5IO* h5f, const std::string& group_prefix = "/");
 #endif
         /// @brief Transpose  block elements
         ///

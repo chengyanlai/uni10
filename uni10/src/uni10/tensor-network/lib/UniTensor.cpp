@@ -605,14 +605,19 @@ UniTensor::UniTensor(const std::string& fname): status(0){ //GPU
   }
 }
 #ifdef HDF5
-UniTensor::UniTensor(const std::string& fname, const bool hdf5): status(0){ //GPU
+UniTensor::UniTensor(const std::string& fname, const std::string& prefix, const bool hdf5): status(0){ //GPU
   try{
     HDF5IO h5f(fname.c_str());
-    h5f.loadFlag("Status", "flag", r_flag, c_flag);
-    int st = h5f.loadInt("Status", "status");
-    int bondNum = h5f.loadInt("Bonds", "bondNum");
+    std::string path = prefix;
+    path.append("Status");
+    h5f.loadFlag(path, "flag", r_flag, c_flag);
+    int st = h5f.loadInt(path, "status");
+    path = prefix;
+    path.append("Bonds");
+    int bondNum = h5f.loadInt(path, "bondNum");
     for(int b = 0; b < bondNum; b++){
-      std::string gname = "Bonds/bond-";
+      std::string gname = prefix;
+      gname.append("Bonds/bond-");
       gname.append(std::to_string((unsigned long long)b));
       int num_q = h5f.loadInt(gname, "numQnums");
       bondType tp;
@@ -637,18 +642,20 @@ UniTensor::UniTensor(const std::string& fname, const bool hdf5): status(0){ //GP
       bonds.push_back(bd);
     }
     initUniT(typeID());// from rflag and cflag
-    int num_l = h5f.loadInt("Bonds", "num_label");
+    int num_l = h5f.loadInt(path, "num_label");
     if(!(num_l == bonds.size())){
       std::ostringstream err;
       err<<"Error in reading file '"<<fname<<"' in.";
       throw std::runtime_error(exception_msg(err.str()));
     }
     labels.assign(num_l, 0);
-    h5f.loadStdVector("Bonds", "labels", labels);
+    h5f.loadStdVector(path, "labels", labels);
+    path = prefix;
+    path.append("Block");
     if(typeID() == 1){
       if(st & HAVEELEM){
         Real* work;
-        h5f.loadRawBuffer("Block", "m_elem", m_elemNum, work);
+        h5f.loadRawBuffer(path, "m_elem", m_elemNum, work);
         setElem(work, ongpu);
         status |= HAVEELEM;
       }
@@ -656,7 +663,7 @@ UniTensor::UniTensor(const std::string& fname, const bool hdf5): status(0){ //GP
     if(typeID() == 2){
       if(st & HAVEELEM){
         Complex* work;
-        h5f.loadRawBuffer("Block", "m_elem", m_elemNum, work);
+        h5f.loadRawBuffer(path, "m_elem", m_elemNum, work);
         setElem(work, ongpu);
         status |= HAVEELEM;
       }
@@ -1429,8 +1436,13 @@ Matrix UniTensor::getRawElem()const{
 
 UniTensor& UniTensor::assign(const std::vector<Bond>& _bond){
   try{
-    UniTensor T(_bond);
-    *this = T;
+    if ( this->typeID() == 1 ){
+      UniTensor T("R", _bond);
+      *this = T;
+    }else if ( this->typeID() == 2 ){
+      UniTensor T("C", _bond);
+      *this = T;
+    }
   }
   catch(const std::exception& e){
     propogate_exception(e, "In function UniTensor::assign(std::vector<Bond>&):");
