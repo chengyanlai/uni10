@@ -63,7 +63,7 @@ namespace uni10{
       Matrix Mc(RTYPE, Mb.Rnum, Mb.Cnum);
       setDiag(Mc.m_elem,Mb.m_elem,Mc.Rnum,Mc.Cnum,Mb.Cnum,Mc.ongpu,Mb.ongpu);
       vectorAdd(Ma.m_elem, Mc.m_elem, Mc.elemNum(), Mc.ongpu, Ma.ongpu);
-    } else 
+    } else
       vectorAdd(Ma.m_elem, Mb.m_elem, Ma.elemNum(), Ma.ongpu, Mb.ongpu);
 
   }
@@ -79,7 +79,7 @@ namespace uni10{
       Matrix Mc(CTYPE, Mb.Rnum,Mb.Cnum);
       setDiag(Mc.cm_elem,Mb.cm_elem,Mc.Rnum,Mc.Cnum,Mb.Cnum,Mc.ongpu,Mb.ongpu);
       vectorAdd(Ma.cm_elem, Mc.cm_elem, Mc.elemNum(), Mc.ongpu, Ma.ongpu);
-    } else 
+    } else
       vectorAdd(Ma.cm_elem, Mb.cm_elem, Ma.elemNum(), Ma.ongpu, Mb.ongpu);
 
   }
@@ -109,13 +109,24 @@ namespace uni10{
     }
   }
 
-  Matrix exph(double a, const Block& mat){
+  Matrix exph(double a, const Block& mat, const int& power){
     try{
-      std::vector<Matrix> rets = mat.eigh();
-      Matrix UT(rets[1]);
-      UT.cTranspose();
-      vectorExp(a, rets[0].getElem(RTYPE), rets[0].row(), rets[0].isOngpu());
-      return UT * (rets[0] * rets[1]);
+      if ( power == 0 ){
+        std::vector<Matrix> rets = mat.eigh();
+        Matrix UT(rets[1]);
+        UT.cTranspose();
+        vectorExp(a, rets[0].getElem(RTYPE), rets[0].row(), rets[0].isOngpu());
+        return UT * (rets[0] * rets[1]);
+      }else{
+        Matrix Id(RTYPE, mat.row(), mat.col(), true);
+        Id.identity();
+        Matrix work = mat;
+        for (ptrdiff_t p = power; p > 0; p--) {
+          double factor = a / double(p);
+          work = Id + factor * work;
+        }
+        return work;
+      }
     }
     catch(const std::exception& e){
       propogate_exception(e, "In function exph(double, uni10::Matrix&):");
@@ -145,12 +156,23 @@ namespace uni10{
     return Matrix();
   }
 
-  Matrix exp(double a, const Block& mat){
+  Matrix exp(double a, const Block& mat, const int& power){
     try{
-      std::vector<Matrix> rets = mat.eig();
-      Matrix Uinv = rets[1].inverse();
-      vectorExp(a, rets[0].getElem(CTYPE), rets[0].row(), rets[0].isOngpu());
-      return Uinv * CDotC(rets[0], rets[1]);
+      if ( power == 0 ){
+        std::vector<Matrix> rets = mat.eig();
+        Matrix Uinv = rets[1].inverse();
+        vectorExp(a, rets[0].getElem(CTYPE), rets[0].row(), rets[0].isOngpu());
+        return Uinv * CDotC(rets[0], rets[1]);
+      }else{
+        Matrix Id(mat.row(), mat.col(), true);
+        Id.identity();
+        Matrix work = mat;
+        for (ptrdiff_t p = power; p > 0; p--) {
+          std::complex<double> factor = a / std::complex<double>(p);
+          work = Id + factor * work;
+        }
+        return work;
+      }
     }
     catch(const std::exception& e){
       propogate_exception(e, "In function exp(double, uni10::Matrix&):");
@@ -158,12 +180,23 @@ namespace uni10{
     return Matrix();
   }
 
-  Matrix exp(const std::complex<double>& a, const Block& mat){
+  Matrix exp(const std::complex<double>& a, const Block& mat, const int& power){
     try{
-      std::vector<Matrix> rets = mat.eig();
-      Matrix Uinv = rets[1].inverse();
-      vectorExp(a, rets[0].getElem(CTYPE), rets[0].row(), rets[0].isOngpu());
-      return Uinv * CDotC(rets[0], rets[1]);
+      if ( power == 0 ){
+        std::vector<Matrix> rets = mat.eig();
+        Matrix Uinv = rets[1].inverse();
+        vectorExp(a, rets[0].getElem(CTYPE), rets[0].row(), rets[0].isOngpu());
+        return Uinv * CDotC(rets[0], rets[1]);
+      }else{
+        Matrix Id(mat.row(), mat.col(), true);
+        Id.identity();
+        Matrix work = mat;
+        for (ptrdiff_t p = power; p > 0; p--) {
+          std::complex<double> factor = a / std::complex<double>(p);
+          work = Id + factor * work;
+        }
+        return work;
+      }
     }
     catch(const std::exception& e){
       propogate_exception(e, "In function exp(std::complex<double>, uni10::Matrix&):");

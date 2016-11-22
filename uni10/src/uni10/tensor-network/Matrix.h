@@ -63,7 +63,7 @@ public:
     friend void CAddC(Matrix& Ma, const Matrix& Mb);
 
     /*********************  developping  **********************/
-    
+
     Real absMax(bool _ongpu=false);
     Real absMax(rflag tp, bool _ongpu=false);
 
@@ -78,7 +78,7 @@ public:
     Complex* getHostElem(cflag _tp);
 
     bool toGPU();
-    
+
 	  /*********************  OPERATOR **************************/
     /// @brief Assigns to Matrix
     ///
@@ -169,7 +169,7 @@ public:
     ///
     /// Transposes the elements of the Matrix. Exchange the row and column numbers.
     Matrix& cTranspose();
-    
+
     /// @brief Transpose a complex Matrix and take complex co
     ///
     /// Transposes the elements of the Matrix. Exchange the row and column numbers.
@@ -249,7 +249,7 @@ public:
     ///
     /// Transposes the elements of the Matrix. Exchange the row and column numbers.
     Matrix& transpose(rflag _tp);
-    
+
 
     /// @brief Transpose a complex Matrix
     ///
@@ -375,7 +375,7 @@ public:
 
     bool toGPU(cflag _tp);
 
-    
+
     /*****************************************************/
 
 private:
@@ -404,11 +404,11 @@ void CAddR(Matrix& Ma, const Matrix& Mb);
 void RAddC(Matrix& Ma, const Matrix& Mb);
 void CAddC(Matrix& Ma, const Matrix& Mb);
 Matrix takeExp(Real a, const Block& mat);
-Matrix exph(Real a, const Block& mat);
+Matrix exph(Real a, const Block& mat, const int& power = 0);
 Matrix exph(rflag tp, Real a, const Block& mat);
 Matrix exph(cflag tp,Real a, const Block& mat);
-Matrix exp(Real a, const Block& mat);
-Matrix exp(const Complex& a, const Block& mat);
+Matrix exp(Real a, const Block& mat, const int& power = 0);
+Matrix exp(const Complex& a, const Block& mat, const int& power = 0);
 Matrix exp(const Block& mat);
 Matrix exph(const Block& mat);
 
