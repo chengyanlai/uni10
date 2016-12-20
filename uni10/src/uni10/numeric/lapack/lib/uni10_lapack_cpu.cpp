@@ -152,10 +152,10 @@ void eigSyDecompose(double* Kij, int N, double* Eig, double* EigVec, bool ongpu)
   }
 	free(work);
 }
-// lapack is builded by fortran which is load by column, so we use 
+// lapack is builded by fortran which is load by column, so we use
 // dorgqr -> lq
 // dorglq -> qr
-// dorgrq -> ql 
+// dorgrq -> ql
 // dorgql -> rq
 void matrixQR(double* Mij_ori, int M, int N, double* Q, double* R, bool ongpu){
   assert(M >= N);
@@ -608,7 +608,7 @@ void matrixSVD(std::complex<double>* Mij_ori, int M, int N, std::complex<double>
 	zgesvd((char*)"S", (char*)"S", &N, &M, Mij, &ldA, S, vT, &ldu, U, &ldvT, &worktest, &lwork, rwork, &info);
   if(info != 0){
     std::ostringstream err;
-    err<<"Error in Lapack function 'dgesvd': Lapack INFO = "<<info;
+    err<<"Error in Lapack function 'zgesvd': Lapack INFO = "<<info;
     throw std::runtime_error(exception_msg(err.str()));
   }
 	lwork = (int)(worktest.real());

@@ -454,19 +454,22 @@ void HDF5IO::loadStdVector(const std::string& GroupName, const std::string& Name
 void HDF5IO::loadStdVector(const std::string& GroupName, const std::string& Name,
     std::vector<double>& V){
     try{
-        H5::Group FG = getGroup( GroupName );
-        H5::DataSet DataSet = FG.openDataSet(Name.c_str());
-        H5::DataSpace DataSpace = DataSet.getSpace();
-        if(DataSpace.getSimpleExtentNdims() != 1)
-            throw(H5::DataSpaceIException("HDF5IO::loadRealVector()",
-                          "Unexpected multidimentional dataspace."));
-        V.resize(DataSpace.getSimpleExtentNpoints());
-        DataSet.read(V.data(),H5::PredType::NATIVE_DOUBLE);
-        FG.close();
+      H5::Group FG = getGroup( GroupName );
+      H5::DataSet DataSet = FG.openDataSet(Name.c_str());
+      H5::DataSpace DataSpace = DataSet.getSpace();
+      if(DataSpace.getSimpleExtentNdims() != 1)
+          throw(H5::DataSpaceIException("HDF5IO::loadRealVector()",
+                        "Unexpected multidimentional dataspace."));
+      V.resize(DataSpace.getSimpleExtentNpoints());
+      DataSet.read(V.data(),H5::PredType::NATIVE_DOUBLE);
+      FG.close();
     } catch( const H5::Exception err ){
-        std::cout << "In Group - " << GroupName << ", and Name is "
-                  << Name << std::endl;
-        throw std::runtime_error("HDF5IO::loadRealStdVector");
+      // err.printError();
+      std::string MSG = "HDF5IO::loadRealStdVector for Group - ";
+      MSG.append(GroupName.c_str());
+      MSG.append(" Dataset - ");
+      MSG.append(Name.c_str());
+      throw std::runtime_error(MSG);
     }
 }
 

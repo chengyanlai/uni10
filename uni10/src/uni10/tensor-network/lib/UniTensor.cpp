@@ -605,7 +605,7 @@ UniTensor::UniTensor(const std::string& fname): status(0){ //GPU
   }
 }
 #ifdef HDF5
-UniTensor::UniTensor(const std::string& fname, const std::string& prefix, const bool hdf5): status(0){ //GPU
+UniTensor::UniTensor(const std::string& fname, const bool hdf5, const std::string& prefix): status(0){ //GPU
   try{
     HDF5IO h5f(fname.c_str());
     std::string path = prefix;

@@ -361,7 +361,7 @@ namespace uni10 {
         /// @brief Create a UniTensor from a HDF5 file
         ///
         /// @param fname Filename to be read in
-        UniTensor(const std::string& fname, const std::string& prefix = "/", const bool hdf5 = true);
+        UniTensor(const std::string& fname, const bool hdf5, const std::string& prefix = "/");
 #endif
         /// @brief Create a UniTensor from a Block
         UniTensor(const Block& UniT);
