@@ -81,7 +81,7 @@ set(UNI10_VERSION
 ### COMMAND LINE OPTIONS
 ######################################################################
 #option(BUILD_STATIC_LIBS "Build the static library" ON)
-#option(BUILD_SHARED_LIBS "Build the shared library" ON)
+option(BUILD_SHARED_LIBS "Build the shared library" OFF)
 #option(BUILD_TESTS "Build test programs" OFF)
 option(BUILD_CUDA_SUPPORT "Build using Nvidia CUDA for GPU library" OFF)
 option(BUILD_PACKAGES "Build Source/Binary Packages" ON)
@@ -229,6 +229,7 @@ IF(BUILD_HDF5_SUPPORT)
     set(HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS})
     find_package(ZLIB)
     set( HDF5_LIBs ${HDF5_LIBs} ${ZLIB_LIBRARIES})
+    set( HDF5_LIBs ${HDF5_LIBs} ${SZLIB})
     #TODO: Need win32
   else()
     set(HDF5_LIBs ${HDF5_C_LIBRARIES} ${HDF5_CXX_LIBRARIES} ${ZLIB_LIBRARIES})
